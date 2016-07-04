@@ -61,7 +61,7 @@ object VerticalBoxBlur {
     val min = src.width / numTasks + 1
     
     val sliding = min match {
-      case 1 => (0 until src.width).map(x => List(x, x+ 1))
+      case 1 => (0 until src.width).map(x => List(x, x + 1))
       case _ => (0 to src.width).sliding(min, min - 1).toList
     }
 
