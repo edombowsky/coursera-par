@@ -41,8 +41,22 @@ object ParallelParenthesesBalancing {
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
    */
   def balance(chars: Array[Char]): Boolean = {
-    ???
-  }
+    
+    def balance0(i: Int, c: Int): Boolean = {
+      if (i == chars.length) c == 0
+      else if (chars(i) == ')' && c == 0) false
+      else {
+        val add = chars(i) match {
+          case ')' => -1
+          case '(' => 1
+          case _ => 0
+        }
+        
+        balance0(i + 1, c + add)
+      }
+    }
+
+    balance0(0, 0)  }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
    */
