@@ -36,7 +36,7 @@ object LineOfSight {
   def lineOfSight(input: Array[Float], output: Array[Float]): Unit = {
     input.zipWithIndex.foreach{
       case (xs, 0) => output(0) = 0
-      case (xs, i) => output(i) = Math.max(xs / i, output(i-1))
+      case (xs, i) => output(i) = max(xs / i, output(i-1))
     }
   }
 
@@ -53,7 +53,12 @@ object LineOfSight {
   /** Traverses the specified part of the array and returns the maximum angle.
    */
   def upsweepSequential(input: Array[Float], from: Int, until: Int): Float = {
-    ???
+    
+    def loop(i: Int, maxAngle: Float): Float =
+      if (i < until) loop(i + 1, max(maxAngle, input(i) / i))
+      else maxAngle
+
+    loop(from, 0f)
   }
 
   /** Traverses the part of the array starting at `from` and until `end`, and
