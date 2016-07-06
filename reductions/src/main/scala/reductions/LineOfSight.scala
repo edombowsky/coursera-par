@@ -117,7 +117,7 @@ object LineOfSight {
   def parLineOfSight(input: Array[Float], output: Array[Float],
     threshold: Int): Unit = {
     
-    val tree = upsweep(input, 0, input.length, threshold)
+    val tree = upsweep(input, 1, input.length, threshold)
     downsweep(input, output, 0f, tree)
   }
 }
