@@ -56,36 +56,46 @@ object ParallelParenthesesBalancing {
       }
     }
 
-    balance0(0, 0)  }
+    balance0(0, 0)
+  }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
    */
   def parBalance(chars: Array[Char], threshold: Int): Boolean = {
 
-    def traverse(idx: Int, until: Int, c: Int, first: Int): (Int, Int) = {
-      if (idx >= until) (c, first)
-      else {
-        val (c1, first1) = chars(idx) match {
-          case '(' => (c + 1, if (first == 0) 1 else first)
-          case ')' => (c - 1, if (first == 0) - 1 else first)
-          case _ => (c, first)
-        }
-        
-        traverse(idx + 1, until, c1, first1)
+    def traverse(idx: Int, until: Int, arg1: Int, arg2: Int): Option[Int] = {
+      if (until - idx <= threshold) {
+        chars.slice(idx, until).foldLeft(Option(0))((n, c) => c match {
+          case '(' => n.map(_ + 1)
+          case ')' => n.map(_ - 1) match {
+            case None => None
+            case Some(y) if y < 0 && idx == 0 => None
+            case x => x
+          }
+          case _ => n
+        })
+      } else {
+        val mid = idx + (until - idx) / 2
+        val (a1, a2) = parallel(traverse(idx, mid, arg1, arg2), 
+                                traverse(mid, until, arg1, arg2))
+
+        val vOption = for {
+          x <- a1
+          y <- a2
+        } yield x + y
+
+        vOption match {
+          case Some(z) if z < 0 && idx == 0 => None
+          case other => other
         }
       }
+    }
 
-      def reduce(from: Int, until: Int): (Int, Int) = {
-        if (until <= from || until - from <= threshold) traverse(from, until, 0, 0)
-        else {
-          val mid = (until - from) / 2
-          val ((c1, first1), (c2, first2)) = parallel(reduce(from, mid), reduce(mid, until))
-          (c1 + c2, if (first1 == 0) first2 else first1)
-        }
-      }
+    def reduce(from: Int, until: Int): Option[Int] = {
+      traverse(0, until, 0, until)
+    }
 
-      val (c, f) = reduce(0, chars.length)
-      c == 0 && f >= 0
+    reduce(0, chars.length).getOrElse(-1) == 0
   }
 
   // For those who want more:
