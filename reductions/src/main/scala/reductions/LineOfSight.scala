@@ -71,7 +71,7 @@ object LineOfSight {
    */
   def upsweep(input: Array[Float], from: Int, end: Int,
     threshold: Int): Tree = {
-    
+
     if (end - from <= threshold) Leaf(from, end, upsweepSequential(input, from, end))
     else {
       val c = from + (end - from) / 2
@@ -87,7 +87,14 @@ object LineOfSight {
    */
   def downsweepSequential(input: Array[Float], output: Array[Float],
     startingAngle: Float, from: Int, until: Int): Unit = {
-    ???
+    
+    def loop(iter: Int, mv: Float): Unit =
+      if (iter < until) {
+        output(iter) = max(input(iter) / iter, mv)
+        loop(iter + 1, output(iter))
+      }
+
+    loop(from, startingAngle)
   }
 
   /** Pushes the maximum angle in the prefix of the array to each leaf of the
