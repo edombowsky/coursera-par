@@ -54,7 +54,7 @@ package object barneshut {
   case class Fork(
     nw: Quad, ne: Quad, sw: Quad, se: Quad
   ) extends Quad {
-    
+
     val centerX: Float = nw.centerX + nw.size/2
     val centerY: Float = nw.centerY + nw.size/2
     val size: Float = nw.size * 2
@@ -69,7 +69,7 @@ package object barneshut {
     val total: Int = nw.total + ne.total + sw.total + se.total
 
     def insert(b: Body): Fork = {
-      if (b.x < centerX) 
+      if (b.x < centerX)
         if (b.y < centerY) Fork(nw.insert(b), ne, sw, se)
         else Fork(nw, ne, sw.insert(b), se)
       else
@@ -86,7 +86,7 @@ package object barneshut {
     val massY: Float = bodies.map(body => body.y * body.mass).sum / mass
     val total: Int = bodies.size
     
-    def insert(b: Body): Quad = 
+    def insert(b: Body): Quad =
       if (size <= minimumSize) Leaf(centerX, centerY, size, bodies :+ b)
       else {
         val nw = Empty(centerX - size / 4, centerY - size / 4, size / 2)
@@ -95,7 +95,7 @@ package object barneshut {
         val se = Empty(centerX + size / 4, centerY + size / 4, size / 2)
 
         (bodies :+ b).foldLeft(Fork(nw, ne, sw, se))((a, b) => a.insert(b))
-      }  
+      }
   }
 
   def minimumSize = 0.00001f
@@ -172,11 +172,13 @@ package object barneshut {
     for (i <- 0 until matrix.length) matrix(i) = new ConcBuffer
 
     def +=(b: Body): SectorMatrix = {
-      
-      val posx: Int = ((b.x - boundaries.minX) / (boundaries.width / sectorPrecision)).toInt
-      val posy: Int = ((b.y - boundaries.minY) / (boundaries.height / sectorPrecision)).toInt
-      this.apply(posx, posy) += b
 
+      def getPos(p1: Float, p2: Float): Int = {
+        ((p1 - p2) / sectorSize).toInt max 0 min sectorPrecision - 1
+      }
+
+      this(getPos(b.x,boundaries.minX),  getPos(b.y,boundaries.minY)) += b
+      
       this
     }
 
